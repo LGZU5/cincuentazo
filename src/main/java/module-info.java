@@ -5,4 +5,6 @@ module com.example.cincuentazo {
 
     opens com.example.cincuentazo to javafx.fxml;
     exports com.example.cincuentazo;
+    exports com.example.cincuentazo.controllers;
+    opens com.example.cincuentazo.controllers to javafx.fxml;
 }
