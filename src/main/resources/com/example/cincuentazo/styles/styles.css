@@ -33,6 +33,30 @@
     -fx-letter-spacing: 0.5px;
 }
 
+/* Hace cualquier contenedor transparente */
+.transparent {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+}
+
+/* También hace transparente el contenido interno de ScrollPane */
+.scroll-pane,
+.scroll-pane > .viewport,
+.scroll-pane > .corner,
+.scroll-pane .scroll-bar {
+    -fx-background-color: transparent !important;
+}
+
+/* Hace transparentes los contenedores internos comunes */
+.hbox,
+.vbox,
+.stack-pane,
+.anchor-pane,
+.region {
+    -fx-background-color: transparent !important;
+}
+
+
 /* ==============================
    🎯 BOTONES (estilo Balatro)
    ============================== */
