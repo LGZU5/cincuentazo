@@ -13,9 +13,7 @@ import javafx.scene.layout.TilePane;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GameController {
 
@@ -27,16 +25,21 @@ public class GameController {
 
     @FXML private Label playerTopName, playerLeftName, playerRightName, playerBottomName;
 
-    @FXML private StackPane boardPane; // tablero central
+    @FXML private ImageView deckImage;
+    @FXML private ImageView lastPlayedImage;
+    @FXML private Label counterLabel;
 
     private int numberOfPlayers = 2;
 
     private DeckModel deck;
     private final List<PlayerModel> players = new ArrayList<>();
 
-    private final Map<String, Image> imageCache = new HashMap<>();
     private final String CARDS_FOLDER = "/com/example/cincuentazo/assets/images/cards/";
     private final String BACK_IMAGE = CARDS_FOLDER + "back.png";
+    private static final double HUMAN_WIDTH = 100, HUMAN_HEIGHT = 140, NPC_WIDTH = 80, NPC_HEIGHT  = 112;
+
+    private CardModel lastPlayed;
+    private int counterValue = 0;
 
     @FXML
     public void initialize() {
@@ -50,7 +53,9 @@ public class GameController {
         for (int i = 1; i < numberOfPlayers; i++) names.add("CPU " + i);
         showPlayers(names);
         initDeckAndDeal();
+        initBoardStart();
         refreshAllHands();
+        updateBoard();
     }
 
     private void initDeckAndDeal() {
@@ -69,114 +74,97 @@ public class GameController {
         }
     }
 
+    private void initBoardStart() {
+        lastPlayed = deck.draw();
+        counterValue = 0;
+    }
+
     private void refreshAllHands() {
-        // bottom (humano)
-        if (playerBottomHand != null) playerBottomHand.getChildren().clear();
-        PlayerModel bottom = players.get(0);
-        for (CardModel c : bottom.getHand().getCards()) {
-            ImageView iv = createCardImageView(c, true, 100, 140);
-            if (iv != null && playerBottomHand != null) playerBottomHand.getChildren().add(iv);
-        }
+        paintHand(playerBottomHand, players.get(0), true, HUMAN_WIDTH, HUMAN_HEIGHT);
 
         if (numberOfPlayers == 2) {
-            if (playerTopHand != null) playerTopHand.getChildren().clear();
-            PlayerModel other = players.get(1);
-            for (CardModel c : other.getHand().getCards()) {
-                ImageView iv = createCardImageView(c, false, 80, 112);
-                if (iv != null && playerTopHand != null) playerTopHand.getChildren().add(iv);
-            }
+            paintHand(playerTopHand, players.get(1), false, NPC_WIDTH, NPC_HEIGHT);
         } else if (numberOfPlayers == 3) {
-            if (playerLeftHand != null) playerLeftHand.getChildren().clear();
-            if (playerRightHand != null) playerRightHand.getChildren().clear();
-            PlayerModel left = players.get(1);
-            PlayerModel right = players.get(2);
-            for (CardModel c : left.getHand().getCards()) {
-                ImageView iv = createCardImageView(c, false, 80, 112);
-                if (iv != null && playerLeftHand != null) playerLeftHand.getChildren().add(iv);
-            }
-            for (CardModel c : right.getHand().getCards()) {
-                ImageView iv = createCardImageView(c, false, 80, 112);
-                if (iv != null && playerRightHand != null) playerRightHand.getChildren().add(iv);
-            }
+            paintHand(playerLeftHand,  players.get(1), false, NPC_WIDTH, NPC_HEIGHT);
+            paintHand(playerRightHand, players.get(2), false, NPC_WIDTH, NPC_HEIGHT);
         } else if (numberOfPlayers == 4) {
-            if (playerLeftHand != null) playerLeftHand.getChildren().clear();
-            if (playerTopHand != null) playerTopHand.getChildren().clear();
-            if (playerRightHand != null) playerRightHand.getChildren().clear();
-            PlayerModel left = players.get(1);
-            PlayerModel top = players.get(2);
-            PlayerModel right = players.get(3);
-            for (CardModel c : left.getHand().getCards()) {
-                ImageView iv = createCardImageView(c, false, 80, 112);
-                if (iv != null && playerLeftHand != null) playerLeftHand.getChildren().add(iv);
-            }
-            for (CardModel c : top.getHand().getCards()) {
-                ImageView iv = createCardImageView(c, false, 80, 112);
-                if (iv != null && playerTopHand != null) playerTopHand.getChildren().add(iv);
-            }
-            for (CardModel c : right.getHand().getCards()) {
-                ImageView iv = createCardImageView(c, false, 80, 112);
-                if (iv != null && playerRightHand != null) playerRightHand.getChildren().add(iv);
-            }
+            paintHand(playerLeftHand,  players.get(1), false, NPC_WIDTH, NPC_HEIGHT);
+            paintHand(playerTopHand,   players.get(2), false, NPC_WIDTH, NPC_HEIGHT);
+            paintHand(playerRightHand, players.get(3), false, NPC_WIDTH, NPC_HEIGHT);
         }
     }
 
-    private ImageView createCardImageView(CardModel card, boolean faceUp, double w, double h) {
-        String path = faceUp ? imagePathForCard(card) : BACK_IMAGE;
-        Image img = loadImage(path, w, h);
-        if (img != null) {
-            ImageView iv = new ImageView(img);
-            iv.setFitWidth(w);
-            iv.setFitHeight(h);
-            iv.setPreserveRatio(true);
-            iv.setUserData(card);
-            return iv;
+    private void paintHand(javafx.scene.layout.Pane container,
+                           PlayerModel player,
+                           boolean faceUp,
+                           double width, double height) {
+        if (container == null || player == null) return;
+        container.getChildren().clear();
+        for (CardModel card : player.getHand().getCards()) {
+            ImageView cardImage = createCardImageView(card, faceUp, width, height);
+            container.getChildren().add(cardImage);
+        }
+    }
+
+    private void updateBoard() {
+        // Mazo (reverso)
+        Image deckImg = loadImage(BACK_IMAGE, HUMAN_WIDTH, HUMAN_HEIGHT);
+        if (deckImage != null && deckImg != null) {
+            deckImage.setImage(deckImg);
         }
 
-        Label fallback = new Label(card == null ? "?" : card.toString());
-        fallback.setMinWidth(w);
-        fallback.setMinHeight(h);
-        fallback.setStyle("-fx-border-color: #444; -fx-alignment: center; -fx-background-color: linear-gradient(#fff,#eee); -fx-padding:6;");
-        javafx.scene.layout.StackPane wrapper = new javafx.scene.layout.StackPane(fallback);
-        wrapper.setPrefSize(w, h);
-        javafx.scene.image.WritableImage snap = wrapper.snapshot(null, null);
-        ImageView iv = new ImageView(snap);
-        iv.setFitWidth(w);
-        iv.setFitHeight(h);
-        iv.setPreserveRatio(true);
-        iv.setUserData(card);
-        return iv;
+        if (lastPlayedImage != null) {
+            Image face = loadImage(imagePathForCard(lastPlayed), HUMAN_WIDTH, HUMAN_HEIGHT);
+            if (face != null) lastPlayedImage.setImage(face);
+        }
+
+        if (counterLabel != null) counterLabel.setText(String.valueOf(counterValue));
+    }
+
+    private ImageView createCardImageView(CardModel card, boolean faceUp, double width, double height) {
+        String path = faceUp ? imagePathForCard(card) : BACK_IMAGE;
+        Image img = loadImage(path, width, height);
+        if (img == null) return null; // sin imagen -> sin vista
+
+        ImageView cardImage = new ImageView(img);
+        cardImage.setFitWidth(width);
+        cardImage.setFitHeight(height);
+        cardImage.setPreserveRatio(true);
+        cardImage.setUserData(card);
+        return cardImage;
     }
 
     private String imagePathForCard(CardModel card) {
         if (card == null || card.rank == null || card.suit == null) return BACK_IMAGE;
-        String r = card.rank;
-        String s;
+        String rankCard = card.rank;
+        String suitCard;
         switch (card.suit) {
-            case "♠": s = "P"; break;
-            case "♥": s = "C"; break;
-            case "♦": s = "D"; break;
-            case "♣": s = "T"; break;
-            default: s = card.suit; break;
+            case "♠": suitCard = "P"; break; // picas
+            case "♥": suitCard = "C"; break; // corazones
+            case "♦": suitCard = "D"; break; // diamantes
+            case "♣": suitCard = "T"; break; // tréboles
+            default: suitCard = card.suit; break;
         }
-        String path = CARDS_FOLDER + r + s + ".png";
-        return path;
+        return CARDS_FOLDER + rankCard + suitCard + ".png";
     }
 
     private Image loadImage(String resourcePath, double width, double height) {
-        String key = resourcePath + "|" + (int) width + "x" + (int) height;
-        if (imageCache.containsKey(key)) return imageCache.get(key);
-        InputStream is = getClass().getResourceAsStream(resourcePath);
-        if (is == null) {
-            return null;
-        }
-        try (InputStream autoClose = is) {
-            Image img = new Image(autoClose, width, height, true, true);
-            imageCache.put(key, img);
-            return img;
+        // Carga directa sin caché
+        try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+            if (is == null) return null;
+            return new Image(is, width, height, true, true);
         } catch (Exception e) {
             System.err.println("error cargando imagen " + resourcePath + " -> " + e.getMessage());
             return null;
         }
+    }
+
+    private void showPlayer(javafx.scene.layout.Pane pane, Label label, String name) {
+        if (pane != null) {
+            pane.setVisible(true);
+            pane.setManaged(true);
+        }
+        if (label != null) label.setText(name);
     }
 
     private void showPlayers(List<String> names) {
@@ -201,14 +189,6 @@ public class GameController {
                 showPlayer(playerRightPane, playerRightName, names.get(3));
                 break;
         }
-    }
-
-    private void showPlayer(javafx.scene.layout.Pane pane, Label label, String name) {
-        if (pane != null) {
-            pane.setVisible(true);
-            pane.setManaged(true);
-        }
-        if (label != null) label.setText(name);
     }
 
     private void hideAllPlayers() {

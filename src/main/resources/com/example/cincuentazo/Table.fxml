@@ -3,10 +3,11 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
 
 <VBox alignment="CENTER"
       styleClass="bg-home"
@@ -16,7 +17,7 @@
       fx:controller="com.example.cincuentazo.controllers.GameController"
       style="-fx-padding: 5;">
 
-    <!-- Fila superior: NPC1 (Scroll horizontal, sin vertical) -->
+    <!-- Fila superior: NPC1 -->
     <StackPane fx:id="playerTopPane">
         <VBox alignment="TOP_CENTER" spacing="8">
             <Label fx:id="playerTopName" style="-fx-font-weight: bold; -fx-font-size: 16px;" text="NPC 1" />
@@ -44,9 +45,37 @@
             </VBox>
         </StackPane>
 
-        <!-- Centro: Tablero (ocupa máximo ancho disponible) -->
+        <!-- Centro: Tablero (mazo, contador, última carta) -->
         <StackPane fx:id="boardPane" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-            <!-- Contenido del tablero: contador, mazos, etc. -->
+            <HBox fx:id="boardContent" alignment="CENTER" spacing="24">
+                <!-- Mazo (reverso) -->
+                <VBox alignment="CENTER" spacing="6">
+                    <Label text="mazo" />
+                    <StackPane>
+                        <ImageView fx:id="deckImage"
+                                   fitWidth="100" fitHeight="140"
+                                   preserveRatio="true"/>
+                    </StackPane>
+                </VBox>
+
+                <!-- Contador -->
+                <VBox alignment="CENTER" spacing="6">
+                    <Label text="contador" />
+                    <StackPane style="-fx-padding: 6; -fx-border-color: #333; -fx-background-color: rgba(255,255,255,0.6); -fx-border-radius:6; -fx-background-radius:6;">
+                        <Label fx:id="counterLabel" text="0" style="-fx-font-weight: bold; -fx-font-size: 22px;" />
+                    </StackPane>
+                </VBox>
+
+                <!-- Última carta jugada -->
+                <VBox alignment="CENTER" spacing="6">
+                    <Label text="última carta" />
+                    <StackPane>
+                        <ImageView fx:id="lastPlayedImage"
+                                   fitWidth="100" fitHeight="140"
+                                   preserveRatio="true"/>
+                    </StackPane>
+                </VBox>
+            </HBox>
         </StackPane>
 
         <!-- Derecha: NPC3 (sin Scroll; 2 columnas) -->
@@ -62,7 +91,7 @@
         </StackPane>
     </HBox>
 
-    <!-- Inferior: Jugador humano (Scroll horizontal, sin vertical) -->
+    <!-- Inferior: Jugador humano -->
     <StackPane fx:id="playerBottomPane">
         <VBox alignment="CENTER" spacing="8">
             <Label fx:id="playerBottomName" style="-fx-font-weight: bold; -fx-font-size: 16px;" text="JUGADOR HUMANO" />
