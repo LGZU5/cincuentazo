@@ -2,16 +2,14 @@ package com.example.cincuentazo.controllers;
 
 import com.example.cincuentazo.models.CardModel;
 import com.example.cincuentazo.models.DeckModel;
-import com.example.cincuentazo.models.HandModel;
 import com.example.cincuentazo.models.PlayerModel;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.TilePane;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -21,34 +19,28 @@ import java.util.Map;
 
 public class GameController {
 
-    @FXML private HBox playerTopPane, playerBottomPane, playerTopHand, playerBottomHand;
-    @FXML private VBox playerLeftPane, playerRightPane, playerLeftHand, playerRightHand;
+    @FXML private StackPane playerTopPane, playerBottomPane;
+    @FXML private StackPane playerLeftPane, playerRightPane;
+
+    @FXML private HBox playerTopHand, playerBottomHand;
+    @FXML private TilePane playerLeftHand, playerRightHand;
+
     @FXML private Label playerTopName, playerLeftName, playerRightName, playerBottomName;
+
+    @FXML private StackPane boardPane; // tablero central
 
     private int numberOfPlayers = 2;
 
     private DeckModel deck;
     private final List<PlayerModel> players = new ArrayList<>();
 
-    // cache simple para no recargar imágenes desde disco/jar cada vez
     private final Map<String, Image> imageCache = new HashMap<>();
-    // ruta CORREGIDA a los assets en tu repo
     private final String CARDS_FOLDER = "/com/example/cincuentazo/assets/images/cards/";
     private final String BACK_IMAGE = CARDS_FOLDER + "back.png";
 
     @FXML
     public void initialize() {
         hideAllPlayers();
-
-        // listeners para redimensionar las cartas de la mano inferior cuando cambie el tamaño del contenedor
-        Platform.runLater(() -> {
-            if (playerBottomHand != null) {
-                playerBottomHand.heightProperty().addListener((obs, oldV, newV) -> adjustBottomCardSizes());
-                playerBottomHand.widthProperty().addListener((obs, oldV, newV) -> adjustBottomCardSizes());
-            }
-        });
-
-        verifyCardResources(); // temporal: borra esta línea cuando confirmes que todo carga
     }
 
     public void setNumberOfPlayers(int playersCount) {
@@ -70,16 +62,11 @@ public class GameController {
         int cardsEach = 4;
         for (int round = 0; round < cardsEach; round++) {
             for (PlayerModel p : players) {
-                CardModel c = deck.draw(); // draw() quita la carta del mazo
+                CardModel c = deck.draw();
                 if (c == null) continue;
                 p.getHand().add(c);
             }
         }
-        System.out.println("[GameController] Reparto completo. Cartas por jugador:");
-        for (int i = 0; i < players.size(); i++) {
-            System.out.println("  player " + i + " (" + players.get(i).getName() + "): " + players.get(i).getHand().size());
-        }
-        System.out.println("[GameController] Deck size after deal: " + (deck == null ? "null" : deck.size()));
     }
 
     private void refreshAllHands() {
@@ -131,16 +118,11 @@ public class GameController {
                 if (iv != null && playerRightHand != null) playerRightHand.getChildren().add(iv);
             }
         }
-
-        // Force layout update and ajustar tamaños de las cartas de la mano inferior después del layout
-        if (playerBottomHand != null) playerBottomHand.requestLayout();
-        Platform.runLater(this::adjustBottomCardSizes);
     }
 
     private ImageView createCardImageView(CardModel card, boolean faceUp, double w, double h) {
         String path = faceUp ? imagePathForCard(card) : BACK_IMAGE;
         Image img = loadImage(path, w, h);
-        System.out.println("[GameController] createCardImageView -> path=" + path + " loaded=" + (img != null));
         if (img != null) {
             ImageView iv = new ImageView(img);
             iv.setFitWidth(w);
@@ -150,7 +132,6 @@ public class GameController {
             return iv;
         }
 
-        // fallback visual — se verá aún si falta la imagen
         Label fallback = new Label(card == null ? "?" : card.toString());
         fallback.setMinWidth(w);
         fallback.setMinHeight(h);
@@ -170,12 +151,11 @@ public class GameController {
         if (card == null || card.rank == null || card.suit == null) return BACK_IMAGE;
         String r = card.rank;
         String s;
-        // mapping en español: picas, corazones, diamantes, treboles -> P, C, D, T
         switch (card.suit) {
-            case "♠": s = "P"; break; // picas
-            case "♥": s = "C"; break; // corazones
-            case "♦": s = "D"; break; // diamantes
-            case "♣": s = "T"; break; // treboles
+            case "♠": s = "P"; break;
+            case "♥": s = "C"; break;
+            case "♦": s = "D"; break;
+            case "♣": s = "T"; break;
             default: s = card.suit; break;
         }
         String path = CARDS_FOLDER + r + s + ".png";
@@ -187,16 +167,14 @@ public class GameController {
         if (imageCache.containsKey(key)) return imageCache.get(key);
         InputStream is = getClass().getResourceAsStream(resourcePath);
         if (is == null) {
-            System.err.println("[GameController] recurso NO encontrado: " + resourcePath);
             return null;
         }
         try (InputStream autoClose = is) {
             Image img = new Image(autoClose, width, height, true, true);
             imageCache.put(key, img);
-            System.out.println("[GameController] cargada imagen: " + resourcePath + " (" + img.getWidth() + "x" + img.getHeight() + ")");
             return img;
         } catch (Exception e) {
-            System.err.println("[GameController] error cargando imagen " + resourcePath + " -> " + e.getMessage());
+            System.err.println("error cargando imagen " + resourcePath + " -> " + e.getMessage());
             return null;
         }
     }
@@ -228,7 +206,7 @@ public class GameController {
     private void showPlayer(javafx.scene.layout.Pane pane, Label label, String name) {
         if (pane != null) {
             pane.setVisible(true);
-            pane.setManaged(true); // importante: que el layout gestione el espacio cuando se muestre
+            pane.setManaged(true);
         }
         if (label != null) label.setText(name);
     }
@@ -243,48 +221,5 @@ public class GameController {
         if (playerLeftName != null) playerLeftName.setText("");
         if (playerRightName != null) playerRightName.setText("");
         if (playerBottomName != null) playerBottomName.setText("");
-    }
-
-    /**
-     * Ajusta dinámicamente fitHeight/fitWidth de las ImageView de la mano inferior
-     * para evitar que se corten cuando el contenedor cambia de tamaño.
-     */
-    private void adjustBottomCardSizes() {
-        if (playerBottomHand == null) return;
-        double availableHeight = playerBottomHand.getHeight();
-        if (availableHeight <= 0) return;
-        // dejamos un pequeño margen
-        double maxCardHeight = Math.min(140, Math.max(24, availableHeight - 12));
-        for (Node n : playerBottomHand.getChildren()) {
-            if (n instanceof ImageView) {
-                ImageView iv = (ImageView) n;
-                Image img = iv.getImage();
-                double ratio = (img != null && img.getHeight() > 0) ? (img.getWidth() / img.getHeight()) : (100.0 / 140.0);
-                iv.setFitHeight(maxCardHeight);
-                iv.setFitWidth(maxCardHeight * ratio);
-            }
-        }
-        playerBottomHand.requestLayout();
-    }
-
-    // helper temporal para depurar recursos
-    private void verifyCardResources() {
-        String[] checks = {
-                BACK_IMAGE,
-                CARDS_FOLDER + "AP.png",  // As de picas
-                CARDS_FOLDER + "10C.png", // 10 corazones
-                CARDS_FOLDER + "KD.png"   // K diamantes
-        };
-        for (String p : checks) {
-            InputStream is = getClass().getResourceAsStream(p);
-            System.out.println("[resources] " + p + " -> " + (is != null ? "OK" : "MISSING"));
-            try { if (is != null) is.close(); } catch (Exception ignored) {}
-        }
-
-        // debug fx:id injection
-        System.out.println("[injection] playerBottomHand = " + playerBottomHand);
-        System.out.println("[injection] playerTopHand = " + playerTopHand);
-        System.out.println("[injection] playerLeftHand = " + playerLeftHand);
-        System.out.println("[injection] playerRightHand = " + playerRightHand);
     }
 }

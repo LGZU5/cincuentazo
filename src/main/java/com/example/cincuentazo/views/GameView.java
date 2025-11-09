@@ -24,6 +24,10 @@ public class GameView extends Stage {
                 getClass().getResourceAsStream("/com/example/cincuentazo/assets/images/icons/favicon.png")
         ));
 
+        scene.getStylesheets().add(
+                getClass().getResource("/com/example/cincuentazo/styles/styles.css").toExternalForm()
+        );
+
         this.setScene(scene);
         this.setTitle("Cincuentazo");
     }

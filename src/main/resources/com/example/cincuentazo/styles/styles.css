@@ -24,8 +24,8 @@
 }
 
 .subtitle {
-    -fx-text-fill: #e8eef9; /* mismo tono suave que el principal */
-    -fx-font-size: 28px; /* más pequeño que el principal (48px) */
+    -fx-text-fill: #e8eef9;
+    -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-font-family: "Segoe UI", "Arial Rounded MT Bold";
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 4, 0.3, 0, 2);
@@ -33,29 +33,57 @@
     -fx-letter-spacing: 0.5px;
 }
 
+/* ==============================
+   🔍 TRANSPARENCIA GLOBAL
+   ============================== */
+
 /* Hace cualquier contenedor transparente */
 .transparent {
     -fx-background-color: transparent !important;
     -fx-border-color: transparent !important;
 }
 
-/* También hace transparente el contenido interno de ScrollPane */
-.scroll-pane,
-.scroll-pane > .viewport,
-.scroll-pane > .corner,
-.scroll-pane .scroll-bar {
-    -fx-background-color: transparent !important;
-}
-
-/* Hace transparentes los contenedores internos comunes */
+/* Hace transparentes los contenedores más comunes */
 .hbox,
 .vbox,
+.border-pane,
 .stack-pane,
 .anchor-pane,
-.region {
+.grid-pane,
+.region,
+.pane {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+/* Transparencia total para los paneles del juego */
+#playerTopPane,
+#playerBottomPane,
+#playerLeftPane,
+#playerRightPane,
+#playerTopHand,
+#playerBottomHand,
+#playerLeftHand,
+#playerRightHand {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+    -fx-background-insets: 0;
+}
+
+/* ScrollPane transparente */
+.scroll-pane,
+.scroll-pane > .viewport,
+.scroll-pane > .corner {
     -fx-background-color: transparent !important;
 }
 
+/* Remueve bordes o box borders residuales */
+* {
+    -fx-border-color: transparent !important;
+    -fx-box-border: transparent !important;
+}
 
 /* ==============================
    🎯 BOTONES (estilo Balatro)
@@ -142,4 +170,12 @@
 .button-play, .button-options, .button-quit {
     -fx-transition: all 0.2s ease-in-out;
     -fx-font-family: "Arial Rounded MT Bold";
+}
+
+#playerTopHand, #playerBottomHand {
+    -fx-alignment: center;
+    -fx-padding: 10;
+    -fx-spacing: 6;
+    -fx-background-color: transparent;
+    -fx-pref-height: -1;
 }
