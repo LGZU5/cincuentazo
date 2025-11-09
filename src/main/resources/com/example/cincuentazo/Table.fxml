@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="root"
+            fx:controller="com.example.cincuentazo.controllers.GameController">
+
+    <top>
+        <HBox fx:id="playerTopPane" spacing="10" alignment="CENTER" style="-fx-padding: 8;">
+            <VBox alignment="CENTER" spacing="4">
+                <Label fx:id="playerTopName" text="Player Top" style="-fx-font-weight: bold;"/>
+                <Label fx:id="playerTopState" text="" style="-fx-font-size: 11px; -fx-text-fill: gray;"/>
+            </VBox>
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="80" prefViewportWidth="400"
+                        hbarPolicy="AS_NEEDED" vbarPolicy="NEVER">
+                <HBox fx:id="playerTopHand" spacing="6" alignment="CENTER_LEFT" style="-fx-padding: 6;"/>
+            </ScrollPane>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox fx:id="playerLeftPane" spacing="8" alignment="CENTER_LEFT" style="-fx-padding: 8;">
+            <VBox alignment="CENTER_LEFT" spacing="4">
+                <Label fx:id="playerLeftName" text="Player Left" style="-fx-font-weight: bold;"/>
+                <Label fx:id="playerLeftState" text="" style="-fx-font-size: 11px; -fx-text-fill: gray;"/>
+            </VBox>
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportWidth="120"
+                        hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <VBox fx:id="playerLeftHand" spacing="6" alignment="TOP_LEFT" style="-fx-padding: 6;"/>
+            </ScrollPane>
+        </VBox>
+    </left>
+
+    <right>
+        <VBox fx:id="playerRightPane" spacing="8" alignment="CENTER_RIGHT" style="-fx-padding: 8;">
+            <VBox alignment="CENTER_RIGHT" spacing="4">
+                <Label fx:id="playerRightName" text="Player Right" style="-fx-font-weight: bold;"/>
+                <Label fx:id="playerRightState" text="" style="-fx-font-size: 11px; -fx-text-fill: gray;"/>
+            </VBox>
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportWidth="120"
+                        hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <VBox fx:id="playerRightHand" spacing="6" alignment="TOP_RIGHT" style="-fx-padding: 6;"/>
+            </ScrollPane>
+        </VBox>
+    </right>
+
+    <center>
+        <StackPane fx:id="tablePane" style="-fx-padding: 16;">
+            <VBox alignment="CENTER" spacing="12">
+                <StackPane fx:id="discardStack" prefWidth="320" prefHeight="220" style="-fx-border-color: #333; -fx-border-radius: 6; -fx-background-color: linear-gradient(#f8f8f8, #ffffff); -fx-padding: 12;">
+                    <Label fx:id="tableTopCard" text="Top Card" style="-fx-font-size: 18px;"/>
+                    <Label fx:id="tableSumLabel" text="Sum: 0" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: rgba(255,255,255,0.8); -fx-padding: 4; -fx-translate-y: 70;"/>
+                </StackPane>
+                <HBox alignment="CENTER" spacing="20">
+                    <VBox alignment="CENTER" spacing="6">
+                        <Label text="Mazo" style="-fx-font-weight: bold;"/>
+                        <ImageView fx:id="deckView" fitWidth="60" fitHeight="90" pickOnBounds="true" preserveRatio="true"/>
+                        <Label fx:id="deckCountLabel" text="x 52" style="-fx-text-fill: gray;"/>
+                    </VBox>
+                    <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
+                    <VBox alignment="CENTER" spacing="6">
+                        <Button fx:id="drawButton" text="Robar" minWidth="100"/>
+                        <Button fx:id="playButton" text="Jugar" minWidth="100"/>
+                        <Button fx:id="passButton" text="Pasar" minWidth="100"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <HBox fx:id="playerBottomPane" spacing="10" alignment="CENTER" style="-fx-padding: 8;">
+            <VBox alignment="CENTER" spacing="4">
+                <Label fx:id="playerBottomName" text="Player Bottom" style="-fx-font-weight: bold;"/>
+                <Label fx:id="playerBottomState" text="" style="-fx-font-size: 11px; -fx-text-fill: gray;"/>
+            </VBox>
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="110" prefViewportWidth="600"
+                        hbarPolicy="AS_NEEDED" vbarPolicy="NEVER">
+                <HBox fx:id="playerBottomHand" spacing="8" alignment="CENTER_LEFT" style="-fx-padding: 6;"/>
+            </ScrollPane>
+        </HBox>
+    </bottom>
+
+</BorderPane>

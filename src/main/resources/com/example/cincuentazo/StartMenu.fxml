@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -12,24 +14,27 @@
                 <Font name="System Bold" size="50.0" />
             </font>
         </Label>
-        <VBox alignment="CENTER" prefHeight="81.0" prefWidth="600.0" style="-fx-spacing: 10; -fx-padding: 20;">
-            <children>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+         <children>
+                                                <Button onAction="#onGuia" text="Guía">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Button>
                                 <Button fx:id="playButton" onAction="#onPlay" text="Jugar">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>
                 </Button>
-                                                <Button layoutX="271.0" layoutY="30.0" onAction="#onGuia" text="Guía">
+            <Button fx:id="quitButton" onAction="#onQuit" text="Salir">
                <font>
                   <Font name="System Bold" size="20.0" />
                </font>
             </Button>
-            <Button fx:id="quitButton" layoutX="271.0" layoutY="176.0" onAction="#onQuit" text="Salir">
-               <font>
-                  <Font name="System Bold" size="20.0" />
-               </font>
-            </Button>
-            </children>
-        </VBox>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </HBox>
     </children>
 </VBox>
