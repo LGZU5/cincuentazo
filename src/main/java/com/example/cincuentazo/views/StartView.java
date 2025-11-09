@@ -4,6 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -15,6 +16,13 @@ public class StartView extends Stage {
         );
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
+        this.getIcons().add(new Image(
+                getClass().getResourceAsStream("/com/example/cincuentazo/assets/images/icons/favicon.png")
+        ));
+
+        scene.getStylesheets().add(
+                getClass().getResource("/com/example/cincuentazo/styles/styles.css").toExternalForm()
+        );
 
         this.setScene(scene);
         this.setTitle("Cincuentazo");
