@@ -1,19 +1,25 @@
 package com.example.cincuentazo.controllers;
 
+import com.example.cincuentazo.views.StartView;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 
-/** Controlador de la vista de instrucciones. */
 public class InstructionsController {
 
-    /** Cierra la ventana actual o vuelve a la pantalla anterior. */
     @FXML
     private void onBack(javafx.event.ActionEvent e) {
-        Object src = e.getSource();
-        if (src instanceof Node) {
-            Stage stage = (Stage) ((Node) src).getScene().getWindow();
-            stage.close();
+        try {
+            // Abrir Home (StartView)
+            StartView startView = StartView.getInstance();
+            startView.show();
+
+            // Cerrar esta ventana
+            Stage current = (Stage) ((Node) e.getSource()).getScene().getWindow();
+            current.close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }
