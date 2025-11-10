@@ -4,6 +4,7 @@ module com.example.cincuentazo {
     requires javafx.graphics;
 
 
+
     opens com.example.cincuentazo to javafx.fxml;
     exports com.example.cincuentazo;
     exports com.example.cincuentazo.controllers;

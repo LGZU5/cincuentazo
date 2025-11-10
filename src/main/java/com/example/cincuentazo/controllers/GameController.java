@@ -1,19 +1,25 @@
 package com.example.cincuentazo.controllers;
 
-import com.example.cincuentazo.models.CardModel;
-import com.example.cincuentazo.models.DeckModel;
-import com.example.cincuentazo.models.PlayerModel;
+import com.example.cincuentazo.models.*;
+import com.example.cincuentazo.views.InstructionsView;
+import com.example.cincuentazo.views.StartView;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
+
+import static javax.security.auth.callback.ConfirmationCallback.OK;
 
 public class GameController {
 
@@ -40,6 +46,9 @@ public class GameController {
 
     private CardModel lastPlayed;
     private int counterValue = 0;
+
+    private CardModel selectedCard = null;
+    private ImageView selectedCardView = null;
 
     @FXML
     public void initialize() {
@@ -122,6 +131,17 @@ public class GameController {
         if (counterLabel != null) counterLabel.setText(String.valueOf(counterValue));
     }
 
+    private void selectCard(CardModel card, ImageView view) {
+        if (selectedCardView != null) {
+            selectedCardView.setStyle("");
+        }
+
+        selectedCard = card;
+        selectedCardView = view;
+
+        selectedCardView.setStyle("-fx-effect: dropshadow(gaussian, rgba(125,73,255,0.65), 20, 0.8, 0, 0);");
+    }
+
     private ImageView createCardImageView(CardModel card, boolean faceUp, double width, double height) {
         String path = faceUp ? imagePathForCard(card) : BACK_IMAGE;
         Image img = loadImage(path, width, height);
@@ -132,6 +152,9 @@ public class GameController {
         cardImage.setFitHeight(height);
         cardImage.setPreserveRatio(true);
         cardImage.setUserData(card);
+        cardImage.setOnMouseClicked(e -> {
+            selectCard(card, cardImage);
+        });
         return cardImage;
     }
 
@@ -202,5 +225,65 @@ public class GameController {
         if (playerLeftName != null) playerLeftName.setText("");
         if (playerRightName != null) playerRightName.setText("");
         if (playerBottomName != null) playerBottomName.setText("");
+    }
+
+    @FXML
+    private void onPlayCard() {
+        if (selectedCard == null) {
+            AlertModel.warning("Selecciona una carta", "No haz seleccionado una carta");
+            return;
+        }
+
+        PlayerModel human = players.get(0);
+        HandModel hand = human.getHand();
+
+        int currentSum = counterValue;
+
+        // Validar jugada
+        if (!selectedCard.isPlayable(currentSum)) {
+            AlertModel.warning("No se puede jugar la carta", "Esta carta supera el maximo de 50");
+            return;
+        }
+
+        // ✅ Actualizar la mesa
+        lastPlayed = selectedCard;
+        counterValue = currentSum + selectedCard.valueWhenPlayed(currentSum);
+
+        // ✅ Remover la carta de la mano
+        hand.removeCard(selectedCard);
+
+        // ✅ Reset selección
+        selectedCard = null;
+        if (selectedCardView != null) {
+            selectedCardView.setStyle("");
+        }
+        selectedCardView = null;
+
+        // ✅ Robar del mazo
+        CardModel newCard = deck.draw();
+        if (newCard != null) {
+            hand.add(newCard);
+        }
+
+        // ✅ Actualizar UI
+        refreshAllHands();
+        updateBoard();
+    }
+
+    @FXML
+    private void Fold(javafx.event.ActionEvent e) {
+        boolean ok = AlertModel.confirm("Confirmacion", "¿Deseas abandonar la partida?");
+        if (ok){
+            try {
+                StartView startView = StartView.getInstance();
+                startView.show();
+
+                Stage current = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                current.close();
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }
