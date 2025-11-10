@@ -139,10 +139,10 @@ public class GameController {
         String rankCard = card.rank;
         String suitCard;
         switch (card.suit) {
-            case "♠": suitCard = "P"; break; // picas
-            case "♥": suitCard = "C"; break; // corazones
-            case "♦": suitCard = "D"; break; // diamantes
-            case "♣": suitCard = "T"; break; // tréboles
+            case "picas": suitCard = "P"; break;
+            case "corazones": suitCard = "C"; break;
+            case "diamantes": suitCard = "D"; break;
+            case "treboles": suitCard = "T"; break;
             default: suitCard = card.suit; break;
         }
         return CARDS_FOLDER + rankCard + suitCard + ".png";

@@ -5,17 +5,14 @@ import java.util.List;
 
 public class CardModel {
 
-    // 🔹 Listas de rangos y palos disponibles (sin usar enums)
     public static final List<String> RANKS = Arrays.asList(
             "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"
     );
 
     public static final List<String> SUITS = Arrays.asList(
-            "♠", "♥", "♦", "♣"
-            // o si prefieres texto: "SPADES", "HEARTS", "DIAMONDS", "CLUBS"
+            "picas", "corazones", "diamantes", "treboles"
     );
 
-    // 🔹 Campos de cada carta
     public final String rank;
     public final String suit;
 
@@ -24,9 +21,6 @@ public class CardModel {
         this.suit = suit;
     }
 
-    /**
-     * Valor base según las reglas. A devuelve 1 aquí.
-     */
     public int baseValue() {
         if (rank == null) return 0;
         switch (rank) {
@@ -47,22 +41,13 @@ public class CardModel {
         }
     }
 
-    /**
-     * Valor que se aplicará al jugar esta carta, dado currentSum.
-     * Para As: intenta 10 si no hace que currentSum + 10 > 50, si no usa 1.
-     */
     public int valueWhenPlayed(int currentSum) {
         if ("A".equals(rank)) {
-            if (currentSum + 10 <= 50) return 10;
-            return 1;
+            return (currentSum + 10 <= 50) ? 10 : 1;
         }
         return baseValue();
     }
 
-    /**
-     * Indica si la carta es jugable dado currentSum (es decir, si al aplicarse
-     * su valor la suma no supera 50).
-     */
     public boolean isPlayable(int currentSum) {
         int v = valueWhenPlayed(currentSum);
         return (currentSum + v) <= 50;
