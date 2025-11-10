@@ -2,6 +2,7 @@ package com.example.cincuentazo.controllers;
 
 
 import com.example.cincuentazo.views.GameView;
+import com.example.cincuentazo.views.InstructionsView;
 import com.example.cincuentazo.views.SelectPlayersView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,7 +30,18 @@ public class StartController {
     }
 
 
-    public void onGuia() {
-        System.out.println("Guia button clicked");
+    public void onGuia(ActionEvent event) {
+        try {
+            InstructionsView instructionsView = InstructionsView.getInstance();
+            instructionsView.show();
+
+            // Cerrar la ventana de inicio
+            Node source = (Node) event.getSource();
+            Stage stage = (Stage) source.getScene().getWindow();
+            stage.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
