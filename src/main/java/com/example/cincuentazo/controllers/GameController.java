@@ -76,7 +76,8 @@ public class GameController {
 
     private void initBoardStart() {
         lastPlayed = deck.draw();
-        counterValue = 0;
+        int currentSum = 0;
+        counterValue = (lastPlayed == null) ? 0 : lastPlayed.valueWhenPlayed(currentSum);
     }
 
     private void refreshAllHands() {

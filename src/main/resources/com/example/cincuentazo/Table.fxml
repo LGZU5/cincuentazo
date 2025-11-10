@@ -62,7 +62,9 @@
                 <VBox alignment="CENTER" spacing="6">
                     <Label text="contador" />
                     <StackPane style="-fx-padding: 6; -fx-border-color: #333; -fx-background-color: rgba(255,255,255,0.6); -fx-border-radius:6; -fx-background-radius:6;">
-                        <Label fx:id="counterLabel" text="0" style="-fx-font-weight: bold; -fx-font-size: 22px;" />
+                        <Label fx:id="counterLabel"
+                               text="0"
+                               style="-fx-font-weight: bold; -fx-font-size: 22px; -fx-text-fill: black;" />
                     </StackPane>
                 </VBox>
 
