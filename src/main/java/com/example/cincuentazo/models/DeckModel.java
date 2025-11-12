@@ -2,6 +2,7 @@ package com.example.cincuentazo.models;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Modelo que representa un mazo de cartas.
@@ -41,6 +42,11 @@ public class DeckModel {
     public boolean isEmpty() {
         return cards.isEmpty();
     }
+
+    public void addToBottom(CardModel card) {
+        cards.add(0, card);
+    }
+
 
     /**
      * Saca la carta superior del mazo.
