@@ -5,7 +5,7 @@ Estado actual (resumen)
 
 Implementado (o parcialmente)
 - Estructura MVC: `models/`, `controllers/`, `views/` y FXML + controladores.
-- Modelos básicos: `CardModel`, `DeckModel`, `HandModel`, `PlayerModel`.
+- Modelos básicos: `CardModel`, `DeckModel`, `HandModel`, `PlayerModel`, "GameEngine".
 - Vistas: `StartView`, `SelectPlayersView`, `GameView`, FXML `Table.fxml` y estilos `styles.css`.
 - Lógica de reparto (DeckModel.draw(), initDeckAndDeal) — se reparten 4 cartas por jugador.
 - Renderizado en interfaz de cartas con `ImageView` (carga con resource path).
@@ -15,17 +15,20 @@ Implementado (o parcialmente)
 - Manejo visual para que paneles ocultos no reserven espacio (setManaged/setVisible).
 - Ajustes responsive básicos (listeners para viewport y ajuste de ImageView).
 
-Falta o está incompleto / mejorable
-----------------------------------
+NUEVO (11/11):
 - Motor de reglas central (GameEngine): no hay una clase única que centralice turnos, estado de la mesa (pile / discard stack), reglas completas de juego, lógica CPU, reabastecer mazo desde descartes, eliminación de jugadores, etc.
 - Lógica de CPU: no existe una estrategia/cronómetro consolidada (2-4s).
 - Reposición de mazo desde descartes cuando se agote: no se ve implementado.
 - Manejo de cartas eliminadas (devolver al final del mazo).
-- Manejo de hilos: no hay hilos separados para la IA/animaciones (requerido por entregables).
+
+Falta o está incompleto / mejorable
+----------------------------------
+- Manejo de hilos: no hay hilos separados para la IA/animaciones (requerido por entregables). (Se estan usando Transitions y no threads)
 - Excepciones propias y control de errores robusto (ej. recursos faltantes).
 - Tests unitarios (3 clases de pruebas requeridas).
-- Documentación JavaDoc en las clases principales.
+- Documentación JavaDoc en las clases principales. (Parcialmente hecho en GameEngine y GameController)
 - Accesibilidad, keyboard navigation y drag & drop.
+- Problemas Ganador/Perdedor
 
 Acciones pendientes
 ------------------------------------------
