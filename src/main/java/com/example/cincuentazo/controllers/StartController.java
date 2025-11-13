@@ -1,7 +1,5 @@
 package com.example.cincuentazo.controllers;
 
-
-import com.example.cincuentazo.views.GameView;
 import com.example.cincuentazo.views.InstructionsView;
 import com.example.cincuentazo.views.SelectPlayersView;
 import javafx.event.ActionEvent;
