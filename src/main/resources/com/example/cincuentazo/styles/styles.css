@@ -164,6 +164,9 @@
     -fx-translate-y: 0;
 }
 
+.selected-card {
+    -fx-effect: dropshadow(gaussian, rgba(125,73,255,0.65), 20, 0.8, 0, 0);
+}
 /* ==============================
    ⚙️ EFECTOS GENERALES
    ============================== */
