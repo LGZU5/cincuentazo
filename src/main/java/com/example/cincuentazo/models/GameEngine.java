@@ -18,7 +18,7 @@ public class GameEngine {
     private static final int HAND_SIZE = 4;
 
     /** Suma máxima permitida en la mesa (regla del juego). */
-    private static final int MAX_SUM = 50;
+    public static final int MAX_SUM = 50;
 
     /** Mazo principal del que se roban cartas. */
     private DeckModel deck;
@@ -398,33 +398,6 @@ public class GameEngine {
          */
         public String message() {
             return message;
-        }
-
-        /**
-         * Nueva suma de la mesa tras la jugada.
-         *
-         * @return nueva suma o -1 si no aplica
-         */
-        public int newSum() {
-            return newSum;
-        }
-
-        /**
-         * Carta que quedó como última jugada después de aplicar la jugada.
-         *
-         * @return carta jugada o null
-         */
-        public CardModel lastPlayed() {
-            return lastPlayed;
-        }
-
-        /**
-         * Carta que fue robada para reponer la mano del jugador (si la hubo).
-         *
-         * @return carta robada o null si no se robó
-         */
-        public CardModel drawn() {
-            return drawn;
         }
     }
 }
