@@ -4,21 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * HandModel - mano simple para un jugador.
+ * HandModel - Represents a simple hand of cards for a player.
  *
- * - Usa ArrayList internamente.
- * - Provee métodos sencillos: add, removeCard, removeAt, getCards (copia), size, clear, contains, get.
+ * <p>
+ * Internally uses an {@link java.util.ArrayList} to manage the cards.
+ * Provides basic management methods for the hand: add, removeCard, removeAt,
+ * getCards (returns a copy), size, clear, contains, and get.
+ * </p>
  */
 public class HandModel {
 
     private final ArrayList<CardModel> cards = new ArrayList<CardModel>();
 
     public HandModel() {
-        // mano inicialmente vacía
+        // Initial hand empty
     }
 
     /**
-     * Añade una carta a la mano. Si la carta es null no hace nada.
+     * Add a card to your hand. If the card is null, it does nothing
      */
     public void add(CardModel c) {
         if (c == null) return;
@@ -26,8 +29,8 @@ public class HandModel {
     }
 
     /**
-     * Elimina la carta indicada de la mano.
-     * Devuelve la carta si se eliminó, o null si no estaba.
+     * Remove the indicated card from the hand
+     * Return the card if it was removed, or null if it wasn't in the hand
      */
     public CardModel removeCard(CardModel c) {
         if (c == null) return null;
@@ -36,8 +39,8 @@ public class HandModel {
     }
 
     /**
-     * Elimina y devuelve la carta en la posición index.
-     * Si el índice es inválido devuelve null.
+     * Removes and returns the card at the index position
+     * If the index is invalid, returns null
      */
     public CardModel removeAt(int index) {
         if (index < 0 || index >= cards.size()) return null;
@@ -45,16 +48,16 @@ public class HandModel {
     }
 
     /**
-     * Devuelve una copia de la lista de cartas (para lectura).
-     * No expone la lista interna para evitar modificaciones externas directas.
+     * Returns a copy of the letter list (for reading).
+     * Does not expose the internal list to prevent direct external modifications.
      */
     public List<CardModel> getCards() {
         return new ArrayList<CardModel>(cards);
     }
 
     /**
-     * Devuelve la carta en la posición index sin eliminarla.
-     * Si el índice es inválido devuelve null.
+     * Returns the card in the index position without deleting it
+     * If the index is invalid, it returns null
      */
     public CardModel get(int index) {
         if (index < 0 || index >= cards.size()) return null;
@@ -62,7 +65,7 @@ public class HandModel {
     }
 
     /**
-     * Indica si la mano contiene la carta dada.
+     * Indicates if the hand has the given card
      */
     public boolean contains(CardModel c) {
         if (c == null) return false;
@@ -70,14 +73,14 @@ public class HandModel {
     }
 
     /**
-     * Número de cartas en la mano.
+     * Number of cards in the hand
      */
     public int size() {
         return cards.size();
     }
 
     /**
-     * Vacía la mano.
+     * Clean the hand
      */
     public void clear() {
         cards.clear();

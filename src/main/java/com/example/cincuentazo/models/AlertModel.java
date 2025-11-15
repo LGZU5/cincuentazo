@@ -7,26 +7,27 @@ import javafx.scene.control.ButtonType;
 import java.util.Optional;
 
 /**
- * Utilidad para mostrar alertas en la UI.
- *
- * Los métodos están preparados para usarse desde cualquier parte del código.
- * Las advertencias (warning) se muestran de forma no bloqueante y se programan
- * mediante Platform.runLater para evitar errores si se llaman durante animaciones
- * o durante el procesamiento de layout.
+ * A utility class for displaying alerts in the UI.
+ * <p>
+ * These methods are designed to be used safely from any thread.
+ * Warning alerts are non-blocking and scheduled using {@link Platform#runLater(Runnable)}
+ * to prevent errors if called during animations or layout processing.
+ * </p>
  */
 public final class AlertModel {
 
     private AlertModel() { /* utilitaria */ }
 
     /**
-     * Muestra una alerta de advertencia (no bloqueante).
+     * Displays a non-blocking warning alert.
+     * <p>
+     * This method uses {@code Platform.runLater} + {@code Alert.show()} to avoid
+     * the {@code IllegalStateException} that can occur when using {@code showAndWait()}
+     * during animations or layout processing.
+     * </p>
      *
-     * Usamos Platform.runLater + Alert.show() para evitar IllegalStateException
-     * que aparece cuando se intenta usar showAndWait() durante animaciones o
-     * procesamiento de layout.
-     *
-     * @param title   título de la alerta
-     * @param content texto a mostrar
+     * @param title   The title of the alert window.
+     * @param content The text content to display.
      */
     public static void warning(String title, String content) {
         Platform.runLater(() -> {
@@ -39,15 +40,16 @@ public final class AlertModel {
     }
 
     /**
-     * Muestra un diálogo de confirmación y devuelve la respuesta del usuario.
+     * Displays a blocking confirmation dialog and returns the user's response.
+     * <p>
+     * This method uses {@code showAndWait()} because it is typically invoked
+     * in response to a direct user action (e.g., a button click), where
+     * blocking the UI thread is acceptable.
+     * </p>
      *
-     * Este método usa showAndWait() porque típicamente se invoca en respuesta a
-     * una acción directa del usuario (p. ej. botón), donde el bloqueo es aceptable.
-     * Si lo invocas en contexto de animación, considera usar una versión asíncrona.
-     *
-     * @param title   título del diálogo
-     * @param content texto del diálogo
-     * @return true si el usuario confirma (OK), false en otro caso
+     * @param title   The title of the dialog window.
+     * @param content The question or text content of the dialog.
+     * @return {@code true} if the user confirmed (pressed OK), {@code false} otherwise.
      */
     public static boolean confirm(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

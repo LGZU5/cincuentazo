@@ -17,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Controlador principal del juego.
- * Gestiona la interacción entre la vista (FXML) y el modelo (GameEngine, PlayerModel, CardModel).
- * Permite seleccionar y jugar cartas, actualizar las manos y el tablero,
- * y manejar los turnos de los jugadores CPU mediante un hilo separado.
+ * The main controller for the card game.
+ * <p>
+ * Manages the interaction between the view (FXML) and the model (GameEngine, PlayerModel, CardModel).
+ * Handles card selection, playing moves, updating player hands and the board state,
+ * and managing CPU player turns via a dedicated thread.
+ * </p>
  */
 public class GameController {
 
@@ -40,52 +42,73 @@ public class GameController {
     private GameEngine gameEngine;
     private int numberOfPlayers = 2;
 
-    /** Carta seleccionada por el jugador humano (si existe). */
+    /** The card currently selected by the human player. */
     private CardModel selectedCard = null;
-    /** Vista (ImageView) de la carta seleccionada (para efectos visuales). */
+    /** The ImageView of the selected card (for visual effects). */
     private ImageView selectedCardView = null;
 
-    /** Hilo único que procesa los turnos de las CPUs. */
+    /** The single thread responsible for processing CPU turns. */
     private CpuTurnsThread cpuThread;
 
+    /**
+     * Initializes the controller. This method is called after all FXML
+     * fields have been injected.
+     */
     @FXML
     public void initialize() {
         hideAllPlayers();
     }
 
+
     /**
-     * Configura el número de jugadores e inicia la partida.
-     * Arranca el hilo de CPUs (si no está corriendo).
+     * Sets the number of players and starts a new game.
+     * Initiates and starts the CPU turns thread if it is not already running.
+     *
+     * @param playersCount The desired number of players (2 to 4).
      */
     public void setNumberOfPlayers(int playersCount) {
-        numberOfPlayers = Math.max(2, Math.min(playersCount, 4));
+        try {
+            numberOfPlayers = Math.max(2, Math.min(playersCount, 4));
 
-        // Inicializar GameEngine y comenzar la partida
-        gameEngine = new GameEngine();
-        gameEngine.startGame(numberOfPlayers);
+            // Initialize GameEngine and start the game
+            gameEngine = new GameEngine();
+            gameEngine.startGame(numberOfPlayers);
 
-        // Obtener nombres de los jugadores desde el motor de juego
-        List<String> names = new ArrayList<>();
-        for (PlayerModel p : gameEngine.getPlayers()) {
-            names.add(p.getName());
-        }
+            // Retrieve player names from the game engine
+            List<String> names = new ArrayList<>();
+            for (PlayerModel p : gameEngine.getPlayers()) {
+                names.add(p.getName());
+            }
 
-        showPlayers(names);
-        refreshAllHands();
-        updateBoard();
+            showPlayers(names);
+            refreshAllHands();
+            updateBoard();
 
-        // Arrancar hilo de CPUs si no existe
-        if (cpuThread == null || !cpuThread.isAlive()) {
-            cpuThread = new CpuTurnsThread(
-                    gameEngine,
-                    () -> { refreshAllHands(); updateBoard(); },
-                    this::checkWinner,
-                    this::checkIfHumanCanPlay
-            );
-            cpuThread.start();
+            // Start CPU thread if it doesn't exist or isn't running
+            if (cpuThread == null || !cpuThread.isAlive()) {
+                cpuThread = new CpuTurnsThread(
+                        gameEngine,
+                        () -> {
+                            refreshAllHands();
+                            updateBoard();
+                        },
+                        this::checkWinner,
+                        this::checkIfHumanCanPlay
+                );
+                cpuThread.start();
+            }
+        } catch (Exception e){
+            AlertModel.warning("Error al iniciar el juego", "No se pudo inicializar el juego" );
         }
     }
 
+    /**
+     * Shows a player pane and sets their name.
+     *
+     * @param pane The StackPane for the player's area.
+     * @param label The Label displaying the player's name.
+     * @param name The player's name.
+     */
     private void showPlayer(javafx.scene.layout.Pane pane, Label label, String name) {
         if (pane != null) {
             pane.setVisible(true);
@@ -94,6 +117,12 @@ public class GameController {
         if (label != null) label.setText(name);
     }
 
+    /**
+     * Configures the visibility and names of player UI components based on
+     * the number of players.
+     *
+     * @param names A list of player names, starting with the human player.
+     */
     private void showPlayers(List<String> names) {
         hideAllPlayers();
 
@@ -121,6 +150,9 @@ public class GameController {
         }
     }
 
+    /**
+     * Hides all player panes and clears their name labels.
+     */
     private void hideAllPlayers() {
         if (playerTopPane != null)    { playerTopPane.setVisible(false);    playerTopPane.setManaged(false); }
         if (playerLeftPane != null)   { playerLeftPane.setVisible(false);   playerLeftPane.setManaged(false); }
@@ -133,12 +165,17 @@ public class GameController {
         if (playerBottomName != null) playerBottomName.setText("");
     }
 
+    /**
+     * Refreshes the display of all players' hands based on the current game state.
+     */
     private void refreshAllHands() {
         if (gameEngine == null) return;
         List<PlayerModel> players = gameEngine.getPlayers();
 
+        // Human player (always index 0)
         paintHand(playerBottomHand, players.get(0), true, HUMAN_WIDTH, HUMAN_HEIGHT);
 
+        // CPU players
         if (numberOfPlayers == 2) {
             paintHand(playerTopHand, players.get(1), false, NPC_WIDTH, NPC_HEIGHT);
         } else if (numberOfPlayers == 3) {
@@ -151,6 +188,15 @@ public class GameController {
         }
     }
 
+    /**
+     * Draws a player's hand in the specified container.
+     *
+     * @param container The layout pane to display the cards in.
+     * @param player The PlayerModel whose hand to display.
+     * @param faceUp True if cards should show their face (human player), false otherwise.
+     * @param width The desired width for each card image.
+     * @param height The desired height for each card image.
+     */
     private void paintHand(javafx.scene.layout.Pane container,
                            PlayerModel player,
                            boolean faceUp,
@@ -164,6 +210,9 @@ public class GameController {
         }
     }
 
+    /**
+     * Updates the game board elements: the deck, the last played card, and the counter label.
+     */
     private void updateBoard() {
         Image deckImg = loadImage(BACK_IMAGE, HUMAN_WIDTH, HUMAN_HEIGHT);
         if (deckImage != null && deckImg != null) {
@@ -181,6 +230,16 @@ public class GameController {
         }
     }
 
+    /**
+     * Creates an ImageView for a given card model.
+     * Includes an event handler for card selection if the card is face up.
+     *
+     * @param card The CardModel to display.
+     * @param faceUp Whether the card should be shown face up or as a back image.
+     * @param width The image width.
+     * @param height The image height.
+     * @return An ImageView instance of the card, or null if image loading fails.
+     */
     private ImageView createCardImageView(CardModel card, boolean faceUp, double width, double height) {
         String path = faceUp ? imagePathForCard(card) : BACK_IMAGE;
         Image img = loadImage(path, width, height);
@@ -192,10 +251,10 @@ public class GameController {
         cardImage.setPreserveRatio(true);
         cardImage.setUserData(card);
 
-        // Listener solo si la carta está boca arriba (mano del humano)
+        // Listener only if the card is face up (human player's hand)
         if (faceUp) {
             cardImage.setOnMouseClicked(e -> {
-                // Solo permitir selección si es turno humano y la carta está en su mano
+                // Only allow selection if it's the human's turn
                 if (gameEngine != null && gameEngine.currentPlayer() != null && gameEngine.currentPlayer().isHuman()) {
                     selectCard(card, cardImage);
                 }
@@ -204,6 +263,12 @@ public class GameController {
         return cardImage;
     }
 
+    /**
+     * Generates the resource path for a card's face image.
+     *
+     * @param card The CardModel.
+     * @return The resource path string.
+     */
     private String imagePathForCard(CardModel card) {
         if (card == null || card.rank == null || card.suit == null) return BACK_IMAGE;
 
@@ -219,16 +284,30 @@ public class GameController {
         return CARDS_FOLDER + rankCard + suitCard + ".png";
     }
 
+    /**
+     * Loads an image resource from the application's classpath.
+     *
+     * @param resourcePath The path to the image resource.
+     * @param width The desired width.
+     * @param height The desired height.
+     * @return The loaded Image object, or null on failure.
+     */
     private Image loadImage(String resourcePath, double width, double height) {
         try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
             if (is == null) return null;
             return new Image(is, width, height, true, true);
         } catch (Exception e) {
-            System.err.println("error cargando imagen " + resourcePath + " -> " + e.getMessage());
+            AlertModel.warning("Error al cargar la imagen","Ha ocurrido un error al cargar la imagen" + resourcePath);
             return null;
         }
     }
 
+    /**
+     * Handles the visual selection/deselection of a card by the human player.
+     *
+     * @param card The CardModel that was clicked.
+     * @param view The ImageView of the card that was clicked.
+     */
     private void selectCard(CardModel card, ImageView view) {
         if (selectedCardView != null) {
             selectedCardView.getStyleClass().remove("selected-card");
@@ -243,9 +322,11 @@ public class GameController {
     }
 
     /**
-     * Maneja el evento de jugar la carta seleccionada por el jugador humano.
-     * La lógica mutante sobre gameEngine se realiza dentro de synchronized(gameEngine)
-     * para evitar condiciones de carrera con el hilo de CPUs.
+     * Handles the FXML action for playing the currently selected card by the human player.
+     * <p>
+     * Critical game logic changes are wrapped in a {@code synchronized(gameEngine)} block
+     * to prevent race conditions with the CPU turns thread.
+     * </p>
      */
     @FXML
     private void onPlayCard() {
@@ -257,7 +338,7 @@ public class GameController {
         if (gameEngine == null) return;
 
         synchronized (gameEngine) {
-            // Validaciones: turno humano y carta en su mano
+            // Validations: human turn and card in hand
             if (!gameEngine.currentPlayer().isHuman()) {
                 AlertModel.warning("No es tu turno", "Espera a tu turno.");
                 return;
@@ -267,33 +348,37 @@ public class GameController {
                 return;
             }
 
-            // Intentar aplicar jugada
+            // Attempt to apply the move
             GameEngine.ApplyResult result = gameEngine.applyResult(selectedCard);
             if (!result.ok()) {
                 AlertModel.warning("No se puede jugar la carta", result.message());
                 return;
             }
 
-            // Reset selección visual
+            // Reset visual selection
             selectedCard = null;
             if (selectedCardView != null) {
                 selectedCardView.getStyleClass().remove("selected-card");
             }
             selectedCardView = null;
 
-            // Actualizar UI en FX Thread (ya estamos en FX thread)
+            //Update UI on FX Thread
             refreshAllHands();
             updateBoard();
 
-            // Avanzar turno: lo hará el engine; el CpuTurnsThread detectará si debe actuar
+            // Advance turn
             gameEngine.nextTurn();
         }
-        // Si el siguiente es humano, comprobamos su estado; si es CPU, el hilo CPU actuará.
+        // Check if the next player (if human) is stuck. CPU thread will handle CPU players.
         if (gameEngine.currentPlayer().isHuman()) {
             checkIfHumanCanPlay();
         }
     }
 
+    /**
+     * Checks if the current human player has any playable cards.
+     * If not, the player is eliminated and game win conditions are checked.
+     */
     private void checkIfHumanCanPlay() {
         PlayerModel human = gameEngine.currentPlayer();
 
@@ -311,29 +396,35 @@ public class GameController {
 
             if (gameEngine.hasWinner()) {
                 PlayerModel winner = gameEngine.getWinner();
-                AlertModel.warning("¡Juego terminado!", winner.getName() + " ha ganado!");
+                AlertModel.warning("¡Juego terminado!", winner.getName() + " haz ganado!");
                 if (cpuThread != null) cpuThread.requestStop();
             }
         }
     }
 
     /**
-     * Comprueba si hay un ganador y muestra un mensaje con el resultado.
+     * Checks if a winner exists and displays the game over message.
      */
     private void checkWinner() {
         if (gameEngine != null && gameEngine.hasWinner()) {
             PlayerModel winner = gameEngine.getWinner();
-            AlertModel.warning("¡Juego terminado!", winner.getName() + " ha ganado!");
+            AlertModel.warning("¡Juego terminado!", winner.getName() + " haz ganado!");
             if (cpuThread != null) cpuThread.requestStop();
         }
     }
 
+    /**
+     * Handles the action for the human player to fold (quit) the current game.
+     * It prompts for confirmation, stops the CPU thread, and returns to the start view.
+     *
+     * @param e The ActionEvent from the UI.
+     */
     @FXML
     private void Fold(javafx.event.ActionEvent e) {
         boolean ok = AlertModel.confirm("Confirmacion", "¿Deseas abandonar la partida?");
         if (ok) {
             try {
-                // detener CPU thread si corre
+                // Stop CPU thread
                 if (cpuThread != null) {
                     cpuThread.requestStop();
                     cpuThread = null;
@@ -346,7 +437,7 @@ public class GameController {
                 current.close();
 
             } catch (Exception ex) {
-                ex.printStackTrace();
+                AlertModel.warning("Error al salir", "No se pudo cerrar correctamente la ventana.");
             }
         }
     }

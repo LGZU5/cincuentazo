@@ -3,44 +3,46 @@ package com.example.cincuentazo.models;
 import java.util.*;
 
 /**
- * Motor de juego que gestiona el estado de una partida de "Cincuentazo".
+ * The game engine responsible for managing the state of a "Cincuentazo" game.
  *
- * Responsabilidades:
- *
- *   Crear y manejar el mazo y la pila de descartes.
- *   Repartir cartas y mantener las manos de los jugadores.
- *   Aplicar jugadas, avanzar turnos y determinar ganador.
- *   Proveer una estrategia simple para CPUs.
+ * <p>Responsibilities include:
+ * <ul>
+ * <li>Creating and managing the deck and discard pile.</li>
+ * <li>Dealing cards and maintaining player hands.</li>
+ * <li>Applying moves, advancing turns, and determining the winner.</li>
+ * <li>Providing a simple AI strategy for CPU players.</li>
+ * </ul>
+ * </p>
  */
 public class GameEngine {
 
-    /** Tamaño inicial de la mano de cada jugador (número de cartas repartidas). */
+    /** Initial hand size for each player (number of cards dealt) */
     private static final int HAND_SIZE = 4;
 
-    /** Suma máxima permitida en la mesa (regla del juego). */
+    /** Maximum allowed sum on the table (game rule) */
     public static final int MAX_SUM = 50;
 
-    /** Mazo principal del que se roban cartas. */
+    /** The main deck from which cards are drawn */
     private DeckModel deck;
 
-    /** Pila de descartes (stack). La carta superior es la más recientemente descartada. */
+    /** The discard pile (stack). The top card is the most recently discarded one */
     private final Deque<CardModel> discard;
 
-    /** Lista de jugadores en la partida. El índice 0 es el jugador humano. */
+    /** List of players in the game. Index 0 is the human player */
     private final List<PlayerModel> players;
 
-    /** Índice del jugador cuyo turno es actualmente. */
+    /** Index of the player whose turn it currently is */
     private int currentPlayerIndex;
 
-    /** Carta que actualmente está visible en la mesa (última jugada). */
+    /** The card currently visible on the table (last card played) */
     private CardModel lastPlayed;
 
-    /** Suma actual de valores en la mesa. */
+    /** The current sum of values on the table */
     private int tableSum;
 
     /**
-     * Constructor del motor de juego.
-     * Inicializa las estructuras de datos para jugadores y descartes.
+     * Constructor for the game engine
+     * Initializes the data structures for players and discards
      */
     public GameEngine() {
         this.players = new ArrayList<>();
@@ -51,23 +53,24 @@ public class GameEngine {
     }
 
     /**
-     * Inicializa una partida nueva con un jugador humano (índice 0) y el resto CPUs.
+     * Initializes a new game with one human player (index 0) and the rest CPUs.
      *
-     * Flujo:
+     * <ul>
+     * <li>Normalizes the number of players (between 2 and 4)</li>
+     * <li>Creates the corresponding PlayerModels</li>
+     * <li>Creates the DeckModel</li>
+     * <li>Deals HAND_SIZE cards to each player</li>
+     * <li>Places an initial card on the table and calculates the starting sum</li>
+     * </ul>
+     * </p>
      *
-     *   normaliza el número de jugadores entre 2 y 4,
-     *   crea los PlayerModel correspondientes,
-     *   crea el mazo (DeckModel),
-     *   reparte HAND_SIZE cartas a cada jugador,
-     *   coloca una carta inicial en la mesa y calcula la suma inicial.
-     *
-     * @param numPlayers número total de jugadores deseado (se ajusta a 2..4)
+     * @param numPlayers The total desired number of players (will be clamped to 2-4)
      */
     public void startGame(int numPlayers) {
         int n = Math.max(2, Math.min(numPlayers, 4));
         players.clear();
 
-        // El primer jugador siempre es el humano
+        // The first player is always the human
         players.add(new PlayerModel("Tú", true));
         for (int i = 1; i < n; i++) {
             players.add(new PlayerModel("CPU" + i, false));
@@ -79,7 +82,7 @@ public class GameEngine {
         tableSum = 0;
         currentPlayerIndex = 0;
 
-        // Reparto inicial de cartas (HAND_SIZE rondas)
+        // Initial deal (HAND_SIZE rounds)
         for (int r = 0; r < HAND_SIZE; r++) {
             for (PlayerModel p : players) {
                 CardModel c = deck.draw();
@@ -87,7 +90,7 @@ public class GameEngine {
             }
         }
 
-        // Colocar carta inicial en mesa
+        // Place the starting card on the table
         lastPlayed = deck.draw();
         if (lastPlayed != null) {
             tableSum = lastPlayed.valueWhenPlayed(0);
@@ -97,55 +100,55 @@ public class GameEngine {
     }
 
     /**
-     * Devuelve el jugador cuyo turno es actualmente.
+     * Returns the player whose turn it currently is.
      *
-     * @return PlayerModel del jugador actual
+     * @return PlayerModel of the current player.
      */
     public PlayerModel currentPlayer() {
         return players.get(currentPlayerIndex);
     }
 
     /**
-     * Devuelve la lista de jugadores (inmutable).
+     * Returns the list of players (unmodifiable).
      *
-     * @return lista inmutable de jugadores
+     * @return Unmodifiable list of players.
      */
     public List<PlayerModel> getPlayers() {
         return Collections.unmodifiableList(players);
     }
 
     /**
-     * Devuelve la última carta jugada y visible en la mesa.
+     * Returns the last card played and visible on the table.
      *
-     * @return carta jugada (puede ser null)
+     * @return The last played card (can be null).
      */
     public CardModel getLastPlayed() {
         return lastPlayed;
     }
 
     /**
-     * Devuelve la suma actual de la mesa.
+     * Returns the current sum of the table.
      *
-     * @return suma de la mesa
+     * @return The table sum.
      */
     public int getTableSum() {
         return tableSum;
     }
 
     /**
-     * Indica si existe un ganador en la partida.
-     * Hay ganador cuando queda exactamente un jugador no eliminado.
+     * Indicates if there is a winner in the game.
+     * A winner exists when exactly one non-eliminated player remains.
      *
-     * @return true si hay un único jugador activo, false en caso contrario
+     * @return true if there is a single active player, false otherwise.
      */
     public boolean hasWinner() {
         return players.stream().filter(p -> !p.isEliminated()).count() == 1;
     }
 
     /**
-     * Obtiene el jugador ganador si existe.
+     * Gets the winning player, if one exists.
      *
-     * @return PlayerModel ganador o null si no hay ganador todavía
+     * @return The winning PlayerModel, or null if there is no winner yet.
      */
     public PlayerModel getWinner() {
         if (!hasWinner()) return null;
@@ -153,70 +156,72 @@ public class GameEngine {
     }
 
     /**
-     * Comprueba si una carta es jugable dadas las reglas actuales de la mesa.
+     * Checks if a card is playable given the current table rules
      *
-     * @param card carta a comprobar
-     * @return true si la carta puede jugarse sin exceder MAX_SUM
+     * @param card The card to check
+     * @return true if the card can be played without exceeding MAX_SUM
      */
     public boolean isPlayable(CardModel card) {
         return card != null && card.isPlayable(tableSum);
     }
 
     /**
-     * Aplica la jugada del jugador actual con la carta indicada.
+     * Applies the current player's move using the specified card
      *
-     * Operaciones realizadas en orden si la jugada es válida:
+     * <p>Operations performed in order if the move is valid:
+     * <ol>
+     * <li>Validates the move (does not exceed MAX_SUM and belongs to the hand)</li>
+     * <li>Moves the previously visible card to the discard pile</li>
+     * <li>Places the new card as visible on the table</li>
+     * <li>Updates the table sum</li>
+     * <li>Removes the card from the player's hand</li>
+     * <li>Refills the deck from discards if necessary</li>
+     * <li>The player draws a card to replenish their hand (if the deck has cards)</li>
+     * </ol>
+     * </p>
      *
-     *   valida la jugada (no excede MAX_SUM y pertenece a la mano),
-     *   mueve la carta previamente visible a descartes,<
-     *   coloca la nueva carta como visible en la mesa,
-     *   actualiza la suma de la mesa,
-     *   remueve la carta de la mano del jugador,
-     *   reabastece el mazo desde descartes si es necesario,
-     *   el jugador roba una carta para reponer la mano (si hay mazo).
-     *
-     * @param card carta a jugar (no debe ser null)
-     * @return ApplyResult con información del resultado (éxito, mensaje y cartas)
-     * @throws NullPointerException si card es null
+     * @param card The card to play (must not be null).
+     * @return ApplyResult with information about the outcome (success, message, cards)
+     * @throws NullPointerException if card is null
      */
     public ApplyResult applyResult(CardModel card) {
         PlayerModel player = currentPlayer();
         Objects.requireNonNull(card, "card");
 
-        // Validar que la carta sea jugable
+        // Validate that the card is playable
         if (!isPlayable(card)) {
             return ApplyResult.invalid("La carta excede el máximo de " + MAX_SUM);
         }
 
-        // Validar que la carta pertenezca al jugador actual
+        // Validate that the card belongs to the current player
         if (!player.getHand().getCards().contains(card)) {
             return ApplyResult.invalid("La carta no pertenece a la mano del jugador actual");
         }
 
-        // Mover carta previa a descartes
+        // Move previous card to discard
         if (lastPlayed != null) {
             discard.push(lastPlayed);
         }
 
-        // Aplicar la jugada
+        // Apply the move
         lastPlayed = card;
         tableSum += card.valueWhenPlayed(tableSum);
         player.getHand().removeCard(card);
 
-        // Reabastecer mazo si es necesario
+        // Refill deck if necessary
         refillIfNeeded();
 
-        // Robar carta para reponer mano del jugador
+        // Draw a card to replenish the player's hand
         CardModel drawn = drawFor(player);
 
         return ApplyResult.ok(tableSum, lastPlayed, drawn);
     }
 
     /**
-     * Roba una carta del mazo para el jugador indicado y la añade a su mano.
+     * Draws a card from the deck for the specified player and adds it to their hand.
      *
-     * @param player jugador que roba
-     * @return carta robada o null si no había cartas disponibles
+     * @param player The player who is drawing.
+     * @return The card drawn, or null if no cards were available.
      */
     public CardModel drawFor(PlayerModel player) {
         if (player == null) return null;
@@ -226,8 +231,8 @@ public class GameEngine {
     }
 
     /**
-     * Avanza el turno al siguiente jugador no eliminado.
-     * Si existe un ganador (solo uno activo) no cambia el turno.
+     * Advances the turn to the next non-eliminated player.
+     * If a winner exists (only one active), the turn does not change.
      */
     public void nextTurn() {
         if (hasWinner()) return;
@@ -242,8 +247,8 @@ public class GameEngine {
     }
 
     /**
-     * Reabastece el mazo desde la pila de descartes (sin incluir la última carta visible).
-     * Las cartas descartadas se barajan antes de incorporarlas al mazo.
+     * Refills the deck from the discard pile (excluding the last visible card) if the deck is empty.
+     * Discarded cards are shuffled before being added to the deck.
      */
     public void refillIfNeeded() {
         if (!deckIsEmpty()) return;
@@ -257,24 +262,24 @@ public class GameEngine {
     }
 
     /**
-     * Comprueba si el mazo está vacío.
-     * Implementación: intenta sacar una carta y devolverla (sin perderla).
+     * Checks if the deck is empty.
+     * Implementation: Attempts to draw a card and return it (without losing it).
      *
-     * @return true si el mazo está vacío
+     * @return true if the deck is empty.
      */
     private boolean deckIsEmpty() {
         CardModel peek = deck.draw();
         if (peek == null) return true;
 
-        // Devolver al fondo del mazo la carta extraída para no modificar el estado
+        // Return the drawn card to the bottom of the deck to avoid modifying the state
         deckAddAllToBottom(Collections.singletonList(peek));
         return false;
     }
 
     /**
-     * Añade una lista de cartas al final (fondo) del mazo en el orden recibido.
+     * Adds a list of cards to the bottom of the deck in the order received.
      *
-     * @param cards lista de cartas a añadir
+     * @param cards The list of cards to add.
      */
     private void deckAddAllToBottom(List<CardModel> cards) {
         if (cards == null || cards.isEmpty()) return;
@@ -284,15 +289,17 @@ public class GameEngine {
     }
 
     /**
-     * Elimina a un jugador que no tiene cartas jugables.
+     * Eliminates a player who has no playable cards.
      *
-     * Si el jugador no tiene ninguna carta jugable:
+     * <p>If the player has no playable cards:
+     * <ul>
+     * <li>Their hand is emptied, and the cards are sent to the bottom of the deck.</li>
+     * <li>The player is marked as eliminated.</li>
+     * </ul>
+     * </p>
      *
-     *   se vacía su mano y las cartas se envían al final del mazo,
-     *   se marca al jugador como eliminado.
-     *
-     * @param player jugador a comprobar/eliminar
-     * @return true si el jugador fue eliminado, false si no fue eliminado
+     * @param player The player to check/eliminate.
+     * @return true if the player was eliminated, false otherwise.
      */
     public boolean eliminateIfStuck(PlayerModel player) {
         if (player == null || player.isEliminated()) return false;
@@ -300,7 +307,7 @@ public class GameEngine {
                 .stream().anyMatch(c -> c.isPlayable(tableSum));
         if (hasPlayable) return false;
 
-        // Enviar sus cartas al final del mazo
+        // Send their cards to the bottom of the deck
         List<CardModel> toReturn = new ArrayList<>(player.getHand().getCards());
         player.getHand().getCards().clear();
         deckAddAllToBottom(toReturn);
@@ -310,12 +317,12 @@ public class GameEngine {
     }
 
     /**
-     * Estrategia sencilla para CPU:
-     * elige la carta jugable que deje la suma final más baja posible (greedy defensivo).
-     * En caso de empate, prefiere la carta con menor delta (más negativa/neutral).
+     * Simple CPU strategy:
+     * Chooses the playable card that results in the lowest possible final sum (defensive greedy).
+     * In case of a tie, it prefers the card with the smallest delta (most negative/neutral).
      *
-     * @param cpu jugador CPU que debe elegir una carta
-     * @return carta elegida o null si no hay cartas jugables
+     * @param cpu The CPU player choosing a card.
+     * @return The chosen card, or null if no cards are playable.
      */
     public CardModel cpuChooseCard(PlayerModel cpu) {
         if (cpu == null || cpu.isEliminated()) return null;
@@ -328,7 +335,7 @@ public class GameEngine {
             if (!c.isPlayable(tableSum)) continue;
             int delta = c.valueWhenPlayed(tableSum);
             int finalSum = tableSum + delta;
-            if (finalSum > MAX_SUM) continue; // por seguridad
+            if (finalSum > MAX_SUM) continue; // Safety check
 
             if (finalSum < bestFinal || (finalSum == bestFinal && delta < bestDelta)) {
                 bestFinal = finalSum;
@@ -340,10 +347,11 @@ public class GameEngine {
     }
 
     /**
-     * Clase inmutable que representa el resultado de intentar aplicar una jugada.
+     * An immutable class that represents the result of attempting to apply a move.
      *
-     * Proporciona información sobre si la jugada fue exitosa, un mensaje
-     * (en caso de error), la nueva suma de la mesa, la carta jugada y la carta robada.
+     * <p>Provides information about whether the move was successful, a message
+     * (in case of error), the new table sum, the card played, and the card drawn.
+     * </p>
      */
     public static final class ApplyResult {
         private final boolean ok;
@@ -361,40 +369,40 @@ public class GameEngine {
         }
 
         /**
-         * Crea un ApplyResult indicando éxito.
+         * Creates an ApplyResult indicating success.
          *
-         * @param sum nueva suma de la mesa
-         * @param last carta que quedó como última jugada
-         * @param drawn carta robada después de la jugada (puede ser null)
-         * @return ApplyResult válido
+         * @param sum      The new table sum.
+         * @param last     The card that became the last played card.
+         * @param drawn    The card drawn after the move (can be null).
+         * @return A valid ApplyResult.
          */
         public static ApplyResult ok(int sum, CardModel last, CardModel drawn) {
             return new ApplyResult(true, null, sum, last, drawn);
         }
 
         /**
-         * Crea un ApplyResult indicando jugada inválida con mensaje.
+         * Creates an ApplyResult indicating an invalid move.
          *
-         * @param msg motivo de la invalidación
-         * @return ApplyResult que representa el fallo
+         _        * @param msg The reason for the invalidation.
+         * @return An ApplyResult representing the failure.
          */
         public static ApplyResult invalid(String msg) {
             return new ApplyResult(false, msg, -1, null, null);
         }
 
         /**
-         * Indica si la jugada fue exitosa.
+         * Indicates if the move was successful.
          *
-         * @return true si la jugada fue aplicada correctamente
+         * @return true if the move was applied correctly.
          */
         public boolean ok() {
             return ok;
         }
 
         /**
-         * Mensaje asociado al resultado (en caso de error).
+         * Message associated with the result (in case of error).
          *
-         * @return mensaje o null si no aplica
+         * @return The message, or null if not applicable.
          */
         public String message() {
             return message;

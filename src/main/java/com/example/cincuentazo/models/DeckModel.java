@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Modelo que representa un mazo de cartas.
+ * Model representing a deck of cards
  */
 public class DeckModel {
 
     private final ArrayList<CardModel> cards = new ArrayList<>();
 
     public DeckModel() {
-        // Crear las 52 cartas usando los valores de CardModel
+        // Create the 52 cards using the CardModel values
         cards.clear();
         for (String suit : CardModel.SUITS) {
             for (String rank : CardModel.RANKS) {
@@ -23,21 +23,21 @@ public class DeckModel {
     }
 
     /**
-     * Baraja el mazo.
+     * Shuffle the deck
      */
     public void shuffle() {
         Collections.shuffle(cards);
     }
 
     /**
-     * Número de cartas restantes.
+     * Number of remaining cards
      */
     public int size() {
         return cards.size();
     }
 
     /**
-     * Indica si el mazo está vacío.
+     * Indicates if the deck is empty
      */
     public boolean isEmpty() {
         return cards.isEmpty();
@@ -49,7 +49,7 @@ public class DeckModel {
 
 
     /**
-     * Saca la carta superior del mazo.
+     * Takes the top card out of the deck
      */
     public CardModel draw() {
         if (cards.isEmpty()) {

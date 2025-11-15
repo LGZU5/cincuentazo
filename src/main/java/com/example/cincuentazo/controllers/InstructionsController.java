@@ -10,11 +10,11 @@ public class InstructionsController {
     @FXML
     private void onBack(javafx.event.ActionEvent e) {
         try {
-            // Abrir Home (StartView)
+            // Open menu view (StartView)
             StartView startView = StartView.getInstance();
             startView.show();
 
-            // Cerrar esta ventana
+            // Close this window
             Stage current = (Stage) ((Node) e.getSource()).getScene().getWindow();
             current.close();
 
